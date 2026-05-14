@@ -1,0 +1,33 @@
+Running 1 test using 1 worker
+
+  x  1 [chromium] > tests/e2e/checkout.spec.ts:128:7 > Checkout > should complete checkout flow (30.1s)
+  x  2 [chromium] > tests/e2e/checkout.spec.ts:128:7 > Checkout > should complete checkout flow (retry 1 of 1) (30.0s)
+
+
+  1) [chromium] > tests/e2e/checkout.spec.ts:128:7 > Checkout > should complete checkout flow
+
+    Browser: chromium
+    OS: Windows 11
+    Retry: retry 1 of 1
+
+    TimeoutError: page.waitForSelector: Timeout 30000ms exceeded while waiting for selector "#checkout-submit-btn" to be visible
+
+    Call log:
+      - waiting for selector "#checkout-submit-btn" to be visible
+      - selector resolved to hidden <button id="checkout-submit-btn" disabled>Place order</button>
+      - waiting for the button to become visible and enabled
+
+    Stack trace:
+      at Locator.waitFor (node_modules\playwright-core\lib\client\locator.js:312:28)
+      at Frame.waitForSelector (node_modules\playwright-core\lib\client\frame.js:411:21)
+      at ProgressController.run (node_modules\playwright-core\lib\server\progress.js:88:22)
+      at FrameSelectors.waitForSelector (node_modules\playwright-core\lib\server\frames.js:795:19)
+      at CheckoutPage.submitOrder (tests\e2e\checkout.spec.ts:84:37)
+      at tests\e2e\checkout.spec.ts:132:11
+
+    attachment #1: screenshot (image/png) -----------------------------------------
+    test-results\e2e-checkout-Checkout-should-complete-checkout-flow-chromium-retry1\test-failed-1.png
+    -------------------------------------------------------------------------------
+
+  1 failed
+    [chromium] > tests/e2e/checkout.spec.ts:128:7 > Checkout > should complete checkout flow

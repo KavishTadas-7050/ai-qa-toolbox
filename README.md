@@ -31,3 +31,30 @@ $env:OPENAI_MODEL = "gpt-5-mini"
 ```powershell
 python -m pytest
 ```
+
+---
+
+## Day 3 – AI Agents
+
+### Log Classifier Agent
+Reads a Playwright failure log and uses the LLM to classify the root cause, failure category, confidence, recommended action, and flakiness.
+
+```powershell
+# Run individually
+python -m agents.log_classifier.main
+
+# Or directly
+python agents/log_classifier/main.py
+```
+
+### Selector Healer Agent
+Takes 3 broken Playwright locators and asks the LLM to suggest robust CSS and Playwright-native replacements.
+
+```powershell
+python -m agents.selector_healer.main
+```
+
+### Run both agents together
+```powershell
+python agents/run_all_agents.py
+```
