@@ -1,6 +1,7 @@
 """Client helpers for OpenAI-backed LLM calls."""
 
 import os
+import base64
 
 try:
     from openai import OpenAI
@@ -36,4 +37,29 @@ def ask_llm(prompt: str, *, model: str = DEFAULT_MODEL, client=None) -> str:
     )
     return response.output_text
 
-__all__ = ["ask_llm"]
+
+def ask_llm_with_image(prompt: str, image_bytes: bytes, *, model: str = DEFAULT_MODEL, client=None) -> str:
+    client = client or _build_client()
+    b64 = base64.b64encode(image_bytes).decode("utf-8")
+    response = client.responses.create(
+        model=model,
+        input=[
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "input_image",
+                        "image_url": f"data:image/png;base64,{b64}",
+                    },
+                    {
+                        "type": "input_text",
+                        "text": prompt,
+                    },
+                ],
+            }
+        ],
+    )
+    return response.output_text
+
+
+__all__ = ["ask_llm", "ask_llm_with_image"]
