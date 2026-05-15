@@ -1,0 +1,13 @@
+.venv
+__pycache__
+*.pyc
+*.pyo
+.pytest_cache
+.git
+.gitignore
+*.png
+*.jpg
+audit_screenshot.png
+.vscode
+*.dist-info
+*.egg-info

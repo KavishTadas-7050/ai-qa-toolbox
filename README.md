@@ -98,3 +98,41 @@ curl -X POST http://localhost:8000/audit/upload \
 2. Screenshot bytes sent to vision LLM with UX audit prompt
 3. LLM returns structured JSON array of issues
 4. Report printed to terminal or returned via API
+
+---
+
+## Day 5 – Containerization & CI Integration
+
+### Docker (local)
+
+Build and run the full toolbox API locally:
+
+```powershell
+# Build
+docker build -t ai-qa-toolbox .
+
+# Run the FastAPI audit server
+docker run --rm -p 8000:80 -e OPENAI_API_KEY=your-key ai-qa-toolbox
+
+# Verify imports only (no API key needed)
+docker run --rm ai-qa-toolbox python -c "from ai_qa_toolbox.core.llm.client import ask_llm; print('OK')"
+```
+
+Build and run the standalone UI auditor service:
+
+```powershell
+docker build -t ui-auditor -f agentic-ui-auditor/Dockerfile .
+docker run --rm -p 8000:80 -e OPENAI_API_KEY=your-key ui-auditor
+```
+
+### CI Pipeline (GitHub Actions)
+
+Three jobs run on every push and pull request:
+
+| Job | What it does |
+|---|---|
+| `test` | Runs pytest with coverage report |
+| `lint` | Runs ruff linter across all Python files |
+| `docker-build` | Builds the Docker image and verifies imports inside the container |
+
+The `docker-build` job runs only after `test` passes.

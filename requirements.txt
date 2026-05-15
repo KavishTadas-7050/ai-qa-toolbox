@@ -1,1 +1,5 @@
--e .[dev]
+openai
+playwright
+fastapi
+uvicorn[standard]
+pydantic
