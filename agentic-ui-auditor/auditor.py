@@ -1,6 +1,5 @@
 import argparse
 import json
-import sys
 from pathlib import Path
 from ai_qa_toolbox.ui_auditor.screenshot import take_screenshot
 from ai_qa_toolbox.core.llm.client import ask_llm_with_image
@@ -30,7 +29,6 @@ def capture(url: str) -> bytes:
     import os
     if os.getenv("MOCK_LLM") == "true":
         # Minimal valid 1x1 PNG — no browser needed in mock/demo mode
-        import base64
         _TINY_PNG = (
             b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01'
             b'\x00\x00\x00\x01\x08\x02\x00\x00\x00\x90wS\xde\x00\x00'
@@ -77,9 +75,9 @@ def print_report(url: str, issues: list[dict]) -> None:
 def main(url: str = DEFAULT_URL) -> list[dict]:
     print(f"[1/3] Capturing screenshot of {url} ...")
     image_bytes = capture(url)
-    print(f"[2/3] Sending to vision LLM for UX analysis ...")
+    print("[2/3] Sending to vision LLM for UX analysis ...")
     issues = analyze(image_bytes)
-    print(f"[3/3] Generating report ...")
+    print("[3/3] Generating report ...")
     print_report(url, issues)
     return issues
 
