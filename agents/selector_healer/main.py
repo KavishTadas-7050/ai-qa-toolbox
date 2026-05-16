@@ -36,7 +36,7 @@ A test is failing because this locator is broken:
   Element context: {context}
   Error: {error}
 
-Suggest a fix by responding with ONLY a valid JSON object \u2014 no markdown, no explanation, no code fences.
+Suggest a fix by responding with ONLY a valid JSON object — no markdown, no explanation, no code fences.
 
 The JSON must have exactly these fields:
 - "original_locator": the failing locator string

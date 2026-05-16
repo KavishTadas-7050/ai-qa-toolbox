@@ -59,7 +59,7 @@ def analyze(image_bytes: bytes) -> list[dict]:
 def print_report(url: str, issues: list[dict]) -> None:
     """Print a human-readable audit report to stdout."""
     print("=" * 60)
-    print(f"UI AUDIT REPORT")
+    print("UI AUDIT REPORT")
     print(f"URL: {url}")
     print(f"Issues found: {len(issues)}")
     print("=" * 60)
