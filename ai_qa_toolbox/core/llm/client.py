@@ -47,7 +47,7 @@ def _build_openai_client():
         )
     if not os.getenv("OPENAI_API_KEY") and not os.getenv("OPENAI_ADMIN_KEY"):
         raise RuntimeError(
-            "Set OPENAI_API_KEY before calling ask_llm."
+            "OpenAI credentials are required. Set OPENAI_API_KEY before calling ask_llm."
         )
     return OpenAI()
 
