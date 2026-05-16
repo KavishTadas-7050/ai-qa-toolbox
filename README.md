@@ -23,11 +23,11 @@ URL / Log / Selector
 │
 ▼
 AI QA Toolbox
-┌─────────────────────────────────────┐
-│  Log Classifier  →  ask_llm         │
-│  Selector Healer →  ask_llm         │
-│  UI Auditor      →  ask_llm_with_image │
-└──────────────┬──────────────────────┘
+┌─────────────────────────────────────────┐
+│  Log Classifier  →  ask_llm             │
+│  Selector Healer →  ask_llm             │
+│  UI Auditor      →  ask_llm_with_image  │
+└──────────────┬──────────────────────────┘
 │
 ▼
 OpenAI API (gpt-4o)

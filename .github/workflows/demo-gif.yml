@@ -1,0 +1,70 @@
+name: Generate Demo GIF
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'agents/**'
+      - 'agentic-ui-auditor/**'
+      - 'ai_qa_toolbox/**'
+      - 'docs/record_demo.sh'
+
+jobs:
+  demo-gif:
+    name: Record and generate demo GIF
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Install asciinema
+        run: pip install asciinema
+
+      - name: Install agg
+        run: |
+          curl -sL https://github.com/asciinema/agg/releases/download/v1.4.2/agg-x86_64-unknown-linux-gnu \
+            -o /usr/local/bin/agg
+          chmod +x /usr/local/bin/agg
+
+      - name: Record demo with asciinema
+        env:
+          MOCK_LLM: "true"
+        run: |
+          asciinema rec docs/demo.cast \
+            --title "AI QA Toolbox Demo" \
+            --command "bash docs/record_demo.sh" \
+            --overwrite
+
+      - name: Convert recording to GIF
+        run: |
+          agg \
+            --font-size 14 \
+            --cols 100 \
+            --rows 35 \
+            docs/demo.cast \
+            docs/demo.gif
+
+      - name: Commit and push demo GIF
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/demo.cast docs/demo.gif
+          git diff --staged --quiet || git commit -m "chore: regenerate demo GIF [skip ci]"
+          git push
