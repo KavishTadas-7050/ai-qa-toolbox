@@ -45,7 +45,10 @@ jobs:
 
       - name: Record demo with asciinema
         env:
-          MOCK_LLM: "true"
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          LLM_PROVIDER: gemini
+          GEMINI_MODEL: gemini-2.0-flash
+          MOCK_LLM: ${{ secrets.GEMINI_API_KEY == '' && 'true' || 'false' }}
         run: |
           asciinema rec docs/demo.cast \
             --title "AI QA Toolbox Demo" \

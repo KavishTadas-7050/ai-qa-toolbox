@@ -158,8 +158,29 @@ ai-qa-toolbox/
 
 | Environment Variable | Required | Default | Description |
 |---|---|---|---|
-| `OPENAI_API_KEY` | Yes | — | Your OpenAI API key |
-| `OPENAI_MODEL` | No | `gpt-4o-mini` | Model used for all LLM calls |
+| `GEMINI_API_KEY` | For live mode | — | Free Google Gemini API key (recommended) |
+| `OPENAI_API_KEY` | For OpenAI mode | — | OpenAI API key (alternative) |
+| `LLM_PROVIDER` | No | auto-detected | `gemini` or `openai` |
+| `GEMINI_MODEL` | No | `gemini-2.0-flash` | Gemini model to use |
+| `OPENAI_MODEL` | No | `gpt-4o-mini` | OpenAI model to use |
+| `MOCK_LLM` | No | `false` | Set to `true` for zero-cost demo mode |
+
+### Getting a free Gemini API key
+
+1. Go to https://aistudio.google.com/app/apikey
+2. Click **Create API key**
+3. Add it as a GitHub secret named `GEMINI_API_KEY`
+4. The demo-gif workflow will automatically use live Gemini responses
+
+### Running locally with Gemini
+
+```powershell
+$env:GEMINI_API_KEY = "your-gemini-key"
+$env:LLM_PROVIDER = "gemini"
+python agents/log_classifier/main.py
+python agents/selector_healer/main.py
+python agentic-ui-auditor/auditor.py --url https://example.com
+```
 
 ---
 
