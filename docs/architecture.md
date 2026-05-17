@@ -32,3 +32,29 @@ L --> M([Audit Report\nissue, severity, recommendation])
 | UI Auditor CLI | `agentic-ui-auditor/auditor.py` | End-to-end UX audit pipeline |
 | UI Auditor API | `agentic-ui-auditor/api.py` | FastAPI wrapper for auditor pipeline |
 | CI Pipeline | `.github/workflows/ci.yml` | Test, lint, and Docker build on every push |
+
+## Day 7 — LangChain ReAct Agent
+
+```mermaid
+flowchart TD
+    A([Task: Analyze failure log]) --> B[ReAct Agent\nagent/react_agent.py]
+    B -->|Thought: list logs| C[list_sample_logs tool]
+    C -->|Observation: paths| B
+    B -->|Thought: classify log| D[classify_log_file tool]
+    D --> E[LangChain Chain\nPromptTemplate | LLM | JsonOutputParser]
+    E --> F[AiQaToolboxLLM\nagent/llm_backend.py]
+    F --> G[ask_llm\nai_qa_toolbox/core/llm/client.py]
+    G -->|Gemini/OpenAI/Mock| H([LLM Response])
+    H --> E
+    E -->|Structured JSON| D
+    D -->|Observation: classification| B
+    B -->|Final Answer| I([category, confidence,\nroot_cause, fix_hint])
+```
+
+| Component | Location | Purpose |
+|---|---|---|
+| LLM Backend | `agent/llm_backend.py` | LangChain BaseLLM wrapping `ask_llm()` |
+| Pydantic Models | `agent/models.py` | Schema for classifier and selector outputs |
+| Classifier Chain | `agent/classifier.py` | PromptTemplate + LLM + JsonOutputParser |
+| LangChain Tools | `agent/tools.py` | `@tool` wrappers callable by the ReAct agent |
+| ReAct Agent | `agent/react_agent.py` | Reason+Act loop with Thought/Action/Observation |

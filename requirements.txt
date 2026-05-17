@@ -3,3 +3,6 @@ playwright
 fastapi
 uvicorn[standard]
 pydantic
+langchain
+langchain-community
+langchain-core

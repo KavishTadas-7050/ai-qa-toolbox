@@ -47,7 +47,8 @@ def _build_openai_client():
         )
     if not os.getenv("OPENAI_API_KEY") and not os.getenv("OPENAI_ADMIN_KEY"):
         raise RuntimeError(
-            "OpenAI credentials are required. Set OPENAI_API_KEY before calling ask_llm."
+            "OpenAI credentials are required. "
+            "Set OPENAI_API_KEY before calling ask_llm."
         )
     return OpenAI()
 
@@ -83,6 +84,14 @@ def _mock_response(prompt: str) -> str:
     """Return realistic hardcoded JSON for demo/CI use when MOCK_LLM=true."""
     import json
     prompt_lower = prompt.lower()
+
+    if "ci failure analyst" in prompt_lower or "fix_hint" in prompt_lower:
+        return json.dumps({
+            "category": "FLAKY",
+            "confidence": 0.92,
+            "root_cause": "The test timed out waiting for a selector to become visible and enabled.",
+            "fix_hint": "Add a robust wait for the UI state or fix the selector readiness condition."
+        }, indent=2)
 
     if "failure_category" in prompt_lower:
         return json.dumps({

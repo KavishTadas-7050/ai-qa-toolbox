@@ -38,6 +38,16 @@ python agentic-ui-auditor/auditor.py --url https://example.com
 echo ""
 sleep 0.5
 
+sleep 1
+
+echo "┌─ Step 4: LangChain ReAct Agent (Day 7) ──"
+echo "  Orchestrates tool calls using Reason+Act loop."
+echo "  Classifies the sample log via LangChain chain."
+echo ""
+sleep 0.5
+python -m agent.react_agent
+echo ""
+
 echo "╔══════════════════════════════════════════╗"
 echo "║           Demo complete ✓                ║"
 echo "╚══════════════════════════════════════════╝"
