@@ -29,4 +29,4 @@ dev = [
 testpaths = ["tests"]
 
 [tool.setuptools.packages.find]
-include = ["ai_qa_toolbox*", "agent*"]
+include = ["ai_qa_toolbox*", "agent*", "api*"]
