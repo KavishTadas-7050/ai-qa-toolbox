@@ -10,7 +10,8 @@ def mock_llm_env(monkeypatch):
 
 
 def test_fix_logger_writes_and_reads(monkeypatch):
-    import tempfile, pathlib
+    import tempfile
+    import pathlib
     tmp_path = pathlib.Path(tempfile.mkdtemp())
     """log_attempt writes a valid JSONL entry that read_attempts returns."""
     from agent import fix_logger
