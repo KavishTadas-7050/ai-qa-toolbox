@@ -18,6 +18,7 @@ dependencies = [
     "fastapi",
     "uvicorn[standard]",
     "docker",
+    "chromadb",
 ]
 
 [project.optional-dependencies]

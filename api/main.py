@@ -96,6 +96,13 @@ async def handle_webhook(request: Request) -> JSONResponse:
     # Step 6: log the attempt
     log_attempt(run_id, classification, fix, sandbox_passed, pr_url)
 
+    # Step 7: store in vector memory for future RAG retrieval
+    try:
+        from agent.memory_store import store_failure
+        store_failure(run_id, classification, fix, sandbox_passed)
+    except Exception as mem_exc:
+        logger.warning("Memory store failed (non-fatal): %s", mem_exc)
+
     return JSONResponse({
         "classification": classification,
         "fix_title": fix.get("fix_title"),

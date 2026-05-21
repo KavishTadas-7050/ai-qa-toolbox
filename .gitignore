@@ -7,3 +7,7 @@ __pycache__/
 
 # Fix attempt logs (runtime generated)
 logs/*.jsonl
+
+# ChromaDB persistent storage (runtime generated)
+chroma_db/*.sqlite3
+chroma_db/*/
