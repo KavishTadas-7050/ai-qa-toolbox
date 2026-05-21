@@ -4,3 +4,6 @@ __pycache__/
 .pytest_cache/
 .pytest_tmp/
 *.egg-info/
+
+# Fix attempt logs (runtime generated)
+logs/*.jsonl

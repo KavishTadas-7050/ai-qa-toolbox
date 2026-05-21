@@ -17,6 +17,7 @@ dependencies = [
     "pydantic",
     "fastapi",
     "uvicorn[standard]",
+    "docker",
 ]
 
 [project.optional-dependencies]
