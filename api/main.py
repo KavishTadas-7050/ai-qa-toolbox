@@ -13,14 +13,19 @@ import os
 from pathlib import Path
 
 from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse, PlainTextResponse
 from fastapi.responses import JSONResponse
+from fastapi.templating import Jinja2Templates
 
+from api.stats import load_stats
 from agent.classifier import classify
 from agent.fixer import suggest_fix
 from agent.fix_logger import log_attempt
 from agent.sandbox_runner import run_fix_in_sandbox, run_fix_in_sandbox_mock
 from config.loader import is_watched, should_notify_slack
 from notifications.slack_notifier import notify_slack
+
+templates = Jinja2Templates(directory="templates")
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -50,6 +55,36 @@ def _open_pr(owner: str, repo: str, run_id: int, fix: dict, sha: str) -> str:
 @app.get("/health")
 async def health() -> dict:
     return {"status": "ok", "mock_mode": MOCK_MODE}
+
+
+@app.get("/stats")
+def get_stats() -> dict:
+    """Return fix attempt statistics as JSON."""
+    return load_stats()
+
+
+@app.get("/dashboard", response_class=HTMLResponse)
+def dashboard(request: Request) -> HTMLResponse:
+    """Render the observability dashboard."""
+    return templates.TemplateResponse(
+        request=request,
+        name="dashboard.html",
+        context={"stats": load_stats()},
+    )
+
+
+@app.get("/metrics", response_class=PlainTextResponse)
+def metrics() -> str:
+    """Return Prometheus-compatible metrics."""
+    s = load_stats()
+    return (
+        "# HELP ci_agent_total_runs Total CI runs analysed\n"
+        "# TYPE ci_agent_total_runs counter\n"
+        f"ci_agent_total_runs {s['total']}\n\n"
+        "# HELP ci_agent_fix_pass_rate Fix sandbox pass rate percent\n"
+        "# TYPE ci_agent_fix_pass_rate gauge\n"
+        f"ci_agent_fix_pass_rate {s['pass_rate']}\n"
+    )
 
 
 @app.post("/webhook")

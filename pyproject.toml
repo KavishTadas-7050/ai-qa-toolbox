@@ -20,6 +20,7 @@ dependencies = [
     "docker",
     "chromadb",
     "requests",
+    "jinja2",
 ]
 
 [project.optional-dependencies]
