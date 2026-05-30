@@ -54,13 +54,11 @@ def test_fixer_uses_memory_context():
     assert isinstance(result, dict)
 
 
-def test_seed_script_runs_without_error(tmp_path, monkeypatch):
-    """seed_memory.py processes the JSONL log without raising."""
+def test_seed_script_runs_without_error(monkeypatch):
     import json
     import tempfile
     import pathlib
 
-    # Write a temp JSONL file
     log_file = pathlib.Path(tempfile.mktemp(suffix=".jsonl"))
     entries = [
         {
@@ -86,4 +84,4 @@ def test_seed_script_runs_without_error(tmp_path, monkeypatch):
     monkeypatch.setattr(seed_module, "LOG_PATH", log_file)
     count = seed_module.seed()
     assert count == 2
-    log_file.unlink(missing_ok=True)
+    log_file.unlink(missing_ok=True)    
