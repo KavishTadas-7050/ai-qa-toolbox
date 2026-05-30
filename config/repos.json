@@ -1,0 +1,9 @@
+{
+  "watched_repos": [
+    {
+      "owner": "KavishTadas-7050",
+      "repo": "ai-qa-toolbox",
+      "notify_slack": true
+    }
+  ]
+}

@@ -1,7 +1,8 @@
 """FastAPI webhook handler — self-healing CI pipeline.
 
 POST /webhook  accepts a GitHub workflow_run webhook payload.
-Pipeline: fetch log → classify → suggest fix → sandbox validate → log attempt.
+Pipeline: check watched list → fetch log → classify → suggest fix
+         → sandbox validate → log attempt → store memory → notify Slack.
 PRs are only opened when the fix passes the sandbox test run.
 """
 
@@ -18,11 +19,13 @@ from agent.classifier import classify
 from agent.fixer import suggest_fix
 from agent.fix_logger import log_attempt
 from agent.sandbox_runner import run_fix_in_sandbox, run_fix_in_sandbox_mock
+from config.loader import is_watched, should_notify_slack
+from notifications.slack_notifier import notify_slack
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="Self-Healing CI Webhook", version="1.0.0")
+app = FastAPI(title="Self-Healing CI Webhook", version="2.0.0")
 
 MOCK_MODE = os.getenv("MOCK_LLM") == "true"
 
@@ -34,7 +37,6 @@ def _fetch_log(owner: str, repo: str, run_id: int) -> str:
         if sample.exists():
             return sample.read_text(encoding="utf-8")
         return "TimeoutError: waiting for selector '#submit-btn' exceeded 30000ms"
-    # Real implementation would call GitHub API here
     raise NotImplementedError(
         "Set MOCK_LLM=true or implement GitHub API log fetching."
     )
@@ -55,11 +57,16 @@ async def handle_webhook(request: Request) -> JSONResponse:
     payload = await request.json()
     run = payload.get("workflow_run", {})
 
+    owner = payload.get("repository", {}).get("owner", {}).get("login", "")
+    repo = payload.get("repository", {}).get("name", "")
+
+    # Step 0: check watched list — silently ignore unregistered repos
+    if not is_watched(owner, repo):
+        return JSONResponse({"status": "ignored", "reason": "repo not in watched list"})
+
     if payload.get("action") != "completed" or run.get("conclusion") != "failure":
         return JSONResponse({"status": "ignored"})
 
-    owner = payload["repository"]["owner"]["login"]
-    repo = payload["repository"]["name"]
     run_id = run["id"]
     repo_url = payload["repository"].get("clone_url", "")
     branch = run.get("head_branch", "main")
@@ -73,6 +80,8 @@ async def handle_webhook(request: Request) -> JSONResponse:
     # Step 2: skip PRs for flaky tests
     if classification.get("category") == "FLAKY":
         log_attempt(run_id, classification, {}, sandbox_passed=False)
+        if should_notify_slack(owner, repo):
+            notify_slack(owner, repo, run_id, classification, pr_url=None)
         return JSONResponse({"classification": classification, "action": "logged_only"})
 
     # Step 3: generate fix suggestion
@@ -102,6 +111,10 @@ async def handle_webhook(request: Request) -> JSONResponse:
         store_failure(run_id, classification, fix, sandbox_passed)
     except Exception as mem_exc:
         logger.warning("Memory store failed (non-fatal): %s", mem_exc)
+
+    # Step 8: send Slack notification
+    if should_notify_slack(owner, repo):
+        notify_slack(owner, repo, run_id, classification, pr_url=pr_url)
 
     return JSONResponse({
         "classification": classification,

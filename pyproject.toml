@@ -19,6 +19,7 @@ dependencies = [
     "uvicorn[standard]",
     "docker",
     "chromadb",
+    "requests",
 ]
 
 [project.optional-dependencies]
@@ -30,4 +31,4 @@ dev = [
 testpaths = ["tests"]
 
 [tool.setuptools.packages.find]
-include = ["ai_qa_toolbox*", "agent*", "api*", "scripts*"]
+include = ["ai_qa_toolbox*", "agent*", "api*", "scripts*", "config*", "notifications*"]
