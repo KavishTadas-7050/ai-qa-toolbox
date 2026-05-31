@@ -1,24 +1,72 @@
-from unittest.mock import Mock
+"""Tests for Day 14 — ZAP client wrapper (mock mode)."""
 
 import pytest
 
-from ai_qa_toolbox.core.llm.client import ask_llm
+
+@pytest.fixture(autouse=True)
+def mock_zap_env(monkeypatch):
+    """All tests run with MOCK_ZAP=true — no Docker needed."""
+    monkeypatch.setenv("MOCK_ZAP", "true")
+    # Reload module to pick up env var
+    import importlib
+    import agent.zap_wrapper as zw
+    importlib.reload(zw)
 
 
-def test_ask_llm_returns_response_text():
-    prompt = "What is the capital of France? Answer in one word."
-    client = Mock()
-    client.responses.create.return_value = Mock(output_text="Paris")
-
-    response = ask_llm(prompt, model="test-model", client=client)
-
-    assert response == "Paris"
-    client.responses.create.assert_called_once_with(model="test-model", input=prompt)
+def test_get_version_returns_string():
+    from agent.zap_wrapper import ZAPClient
+    client = ZAPClient()
+    version = client.get_version()
+    assert isinstance(version, str)
+    assert len(version) > 0
 
 
-def test_ask_llm_requires_openai_credentials(monkeypatch):
-    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
-    monkeypatch.delenv("OPENAI_ADMIN_KEY", raising=False)
+def test_start_spider_returns_scan_id():
+    from agent.zap_wrapper import ZAPClient
+    client = ZAPClient()
+    scan_id = client.start_spider("http://localhost:3000")
+    assert isinstance(scan_id, str)
 
-    with pytest.raises(RuntimeError, match="OpenAI credentials are required"):
-        ask_llm("hello")
+
+def test_get_crawl_map_returns_urls():
+    from agent.zap_wrapper import ZAPClient
+    client = ZAPClient()
+    urls = client.get_crawl_map()
+    assert isinstance(urls, list)
+    assert len(urls) >= 10
+
+
+def test_get_alerts_returns_list():
+    from agent.zap_wrapper import ZAPClient
+    client = ZAPClient()
+    alerts = client.get_alerts()
+    assert isinstance(alerts, list)
+    assert len(alerts) > 0
+
+
+def test_alert_schema():
+    from agent.zap_wrapper import ZAPClient
+    client = ZAPClient()
+    alerts = client.get_alerts()
+    for alert in alerts:
+        assert "alert" in alert
+        assert "risk" in alert
+        assert "url" in alert
+        assert alert["risk"] in ("High", "Medium", "Low", "Informational")
+
+
+def test_run_full_scan_returns_expected_keys():
+    from agent.zap_wrapper import ZAPClient
+    client = ZAPClient()
+    result = client.run_full_scan()
+    assert "urls_found" in result
+    assert "crawl_map" in result
+    assert "alerts" in result
+    assert "zap_version" in result
+    assert result["urls_found"] >= 10
+
+
+def test_spider_smoke_test_passes_in_mock_mode():
+    """smoke_test_spider.py main() completes without assertion errors."""
+    import scripts.smoke_test_spider as smoke
+    smoke.main()

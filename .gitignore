@@ -1,13 +1,11 @@
+.env
 .venv/
 __pycache__/
-*.py[cod]
+*.pyc
+*.pyo
 .pytest_cache/
-.pytest_tmp/
-*.egg-info/
-
-# Fix attempt logs (runtime generated)
+.ruff_cache/
+chroma_db/
 logs/*.jsonl
-
-# ChromaDB persistent storage (runtime generated)
-chroma_db/*.sqlite3
-chroma_db/*/
+*.egg-info/
+dist/

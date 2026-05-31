@@ -3,33 +3,26 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "ai-qa-toolbox"
+name = "sentinel-security-agent"
 version = "0.1.0"
-description = "AI-powered QA automation tooling."
+description = "LangChain agent that eliminates OWASP ZAP false positives."
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "openai",
-    "playwright",
-    "langchain",
-    "langchain-community",
-    "langchain-core",
-    "pydantic",
-    "fastapi",
-    "uvicorn[standard]",
-    "docker",
-    "chromadb",
     "requests",
-    "jinja2",
+    "python-dotenv",
+    "pydantic",
 ]
 
 [project.optional-dependencies]
 dev = [
     "pytest",
+    "pytest-cov",
+    "ruff",
 ]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 
 [tool.setuptools.packages.find]
-include = ["ai_qa_toolbox*", "agent*", "api*", "scripts*", "config*", "notifications*"]
+include = ["agent*", "api*", "config*", "scripts*"]
